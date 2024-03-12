@@ -31,7 +31,7 @@ public class UserConfig {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/user/register").permitAll()
+                .antMatchers("/user/register","/auth/login").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement()

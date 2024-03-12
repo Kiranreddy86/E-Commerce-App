@@ -2,7 +2,9 @@ package com.Ecommerce.User.Service;
 
 import com.Ecommerce.User.DTO.JwtRequest;
 import com.Ecommerce.User.DTO.JwtResponse;
+import com.Ecommerce.User.Entity.Users;
 import com.Ecommerce.User.JWT.JwtAuthenticationHelper;
+import com.Ecommerce.User.Repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -21,16 +23,22 @@ public class AuthService {
 
     @Autowired
     UserDetailsService userDetailsService;
+    @Autowired
+    UserRepo userRepo;
 
     public JwtResponse login(JwtRequest jwtRequest) {
-
-        //authenticate with Authentication manager
+        Users user=userRepo.findByUsername(jwtRequest.getUsername()).get();
+        JwtResponse response=new JwtResponse();
+        response.setUsername(user.getUsername());
+        response.setName(user.getName());
+        response.setEmail(user.getEmail());
+        response.setId(user.getId());
+        response.setUsername(user.getUsername());
         this.doAuthenticate(jwtRequest.getUsername(),jwtRequest.getPassword());
-
         UserDetails userDetails = userDetailsService.loadUserByUsername(jwtRequest.getUsername());
         String token = jwtHelper.generateToken(userDetails);
-
-        JwtResponse response = JwtResponse.builder().token(token).build();
+//        JwtResponse response = JwtResponse.builder().token(token).build();
+        response.setToken(String.valueOf(JwtResponse.builder().token(token).build()));
         return response;
     }
 

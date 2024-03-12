@@ -8,14 +8,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("user")
 public class UserController {
     @Autowired
     UserService userService;
 
-    @PostMapping("/register")
-    public void register(@RequestBody JwtRequest userRequest){
-        userService.register(userRequest);
+    @PostMapping("/signUp")
+    public void register(@RequestBody @Valid JwtRequest userRequest,String role) throws CloneNotSupportedException {
+        userService.register(userRequest,role);
     }
 }

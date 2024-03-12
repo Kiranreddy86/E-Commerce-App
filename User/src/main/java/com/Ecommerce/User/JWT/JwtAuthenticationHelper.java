@@ -40,9 +40,7 @@ public class JwtAuthenticationHelper {
 	}
 
 	public String generateToken(UserDetails userDetails) {
-		
 		Map<String,Object> claims = new HashMap<>();
-		
 		return builder().setClaims(claims).setSubject(userDetails.getUsername())
 		.setIssuedAt(new Date(System.currentTimeMillis()))
 		.setExpiration(new Date(System.currentTimeMillis()+JWT_TOKEN_VALIDITY*1000))

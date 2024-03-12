@@ -12,7 +12,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,8 +31,11 @@ public class Users implements UserDetails {
     @Column
     private String name;
     @Column(unique = true)
+    @NotEmpty
     private String username;
     @Column(unique = true)
+    @Email
+    @NotEmpty
     private String email;
     @Column
     @Min(6)

@@ -19,25 +19,23 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class UserConfig {
-    @Autowired
-    JwtAuthenticationFilter filter;
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception
-    {
 
-        http.csrf().disable().authorizeHttpRequests()
-                .antMatchers("/user/register","/auth/login").permitAll()
-                .anyRequest()
-                .authenticated()
-                .and()
-                .sessionManagement(session -> {
-                    return session.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-                });
-
-        http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
-        return http.build();
+    private final JwtAuthenticationFilter filter;
+    public UserConfig(JwtAuthenticationFilter filter) {
+        this.filter = filter;
     }
 
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception{
+        return httpSecurity.csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("auth/**").permitAll()
+                        .anyRequest().authenticated()
+                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
+                .build();
+    }
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration builder) throws Exception
     {
@@ -46,6 +44,10 @@ public class UserConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+    @Bean
+    public String someStringBean() {
+        return "Hello, this is a string bean!";
     }
 }
 

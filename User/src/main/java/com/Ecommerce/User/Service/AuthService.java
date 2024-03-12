@@ -3,14 +3,17 @@ package com.Ecommerce.User.Service;
 import com.Ecommerce.User.DTO.JwtRequest;
 import com.Ecommerce.User.DTO.JwtResponse;
 import com.Ecommerce.User.Entity.Users;
+import com.Ecommerce.User.Exception.UserAlreadyExistException;
 import com.Ecommerce.User.JWT.JwtAuthenticationHelper;
 import com.Ecommerce.User.Repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,6 +28,8 @@ public class AuthService {
     UserDetailsService userDetailsService;
     @Autowired
     UserRepo userRepo;
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     public JwtResponse login(JwtRequest jwtRequest) {
         Users user=userRepo.findByUsername(jwtRequest.getUsername()).get();
@@ -50,5 +55,13 @@ public class AuthService {
         }catch (BadCredentialsException e) {
             throw new BadCredentialsException("Invalid Username or Password");
         }
+    }
+    public ResponseEntity register(Users users){
+        if(userRepo.existsByUsername(users.getUsername())){
+            throw new UserAlreadyExistException("Aleady User Exists");
+        }
+        String encodedPassword = passwordEncoder.encode(users.getPassword());
+        users.setPassword(encodedPassword);
+        return ResponseEntity.ok(userRepo.save(users));
     }
 }
